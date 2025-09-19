@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { INITIAL_LOAN_INFO } from './constants';
 import { useAitabLoan } from './hooks/useAitabLoan';
 import type { Payment, Tab } from './types';

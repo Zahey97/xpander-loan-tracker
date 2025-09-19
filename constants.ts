@@ -1,4 +1,3 @@
-
 import type { LoanInfo } from './types';
 
 export const INITIAL_LOAN_INFO: LoanInfo = {
