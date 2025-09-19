@@ -1,0 +1,83 @@
+import React, { useState, useMemo } from 'react';
+import { INITIAL_LOAN_INFO } from './constants';
+import { useAitabLoan } from './hooks/useAitabLoan';
+import type { Payment, Tab } from './types';
+import Dashboard from './components/Dashboard';
+import AmortizationScheduleTable from './components/AmortizationScheduleTable';
+import PaymentHistoryList from './components/PaymentHistoryList';
+import HomeIcon from './components/icons/HomeIcon';
+import CalendarIcon from './components/icons/CalendarIcon';
+import HistoryIcon from './components/icons/HistoryIcon';
+
+const App: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<Tab>('dashboard');
+  const [payments, setPayments] = useState<Payment[]>([]);
+
+  const loanData = useAitabLoan(INITIAL_LOAN_INFO, payments);
+
+  const handleAddPayment = (payment: Omit<Payment, 'id'>) => {
+    setPayments(prevPayments => [
+      ...prevPayments,
+      { ...payment, id: Date.now().toString() }
+    ]);
+  };
+
+  const handleUpdatePayment = (updatedPayment: Payment) => {
+    setPayments(prevPayments =>
+      prevPayments.map(p => (p.id === updatedPayment.id ? updatedPayment : p))
+    );
+  };
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return <Dashboard summary={loanData.summary} chartData={loanData.chartData} />;
+      case 'schedule':
+        return <AmortizationScheduleTable schedule={loanData.schedule} />;
+      case 'history':
+        return <PaymentHistoryList payments={payments} onAddPayment={handleAddPayment} onUpdatePayment={handleUpdatePayment} />;
+      default:
+        return <Dashboard summary={loanData.summary} chartData={loanData.chartData} />;
+    }
+  };
+
+  const NavItem: React.FC<{ tab: Tab; label: string; icon: React.ReactNode }> = ({ tab, label, icon }) => {
+    const isActive = activeTab === tab;
+    return (
+      <button
+        onClick={() => setActiveTab(tab)}
+        className={`flex flex-col items-center justify-center w-full pt-2 pb-1 text-sm transition-colors duration-200 ${
+          isActive ? 'text-blue-600' : 'text-slate-500 hover:text-blue-500'
+        }`}
+      >
+        {icon}
+        <span className="mt-1">{label}</span>
+      </button>
+    );
+  };
+  
+  return (
+    <div className="min-h-screen bg-slate-100 font-sans text-slate-800 flex flex-col">
+      <header className="bg-white shadow-md sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <h1 className="text-xl font-bold text-blue-700">Mitsubishi Xpander Loan Tracker</h1>
+            <div className="text-sm text-slate-600 font-medium">Affin Islamic Bank Berhad</div>
+          </div>
+        </div>
+      </header>
+
+      <main className="flex-grow p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto w-full mb-16">
+        {renderContent()}
+      </main>
+
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-t-md flex justify-around">
+         <NavItem tab="dashboard" label="Dashboard" icon={<HomeIcon active={activeTab === 'dashboard'} />} />
+         <NavItem tab="schedule" label="Schedule" icon={<CalendarIcon active={activeTab === 'schedule'} />} />
+         <NavItem tab="history" label="Payments" icon={<HistoryIcon active={activeTab === 'history'} />} />
+      </nav>
+    </div>
+  );
+};
+
+export default App;
