@@ -1,0 +1,5 @@
+{
+  "name": "Mitsubishi Xpander Loan Tracker",
+  "description": "A personal car loan tracker app for Malaysian AITAB financing. It tracks loan details, calculates an amortization schedule, logs payment history, and provides a dashboard with key insights and charts.",
+  "requestFramePermissions": []
+}
